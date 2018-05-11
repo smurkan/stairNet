@@ -16,30 +16,25 @@ class stair_net(torch.nn.Module):
 		y_pred = self.linear2(h_sigm)
 		return y_pred
 
-#dataset = np.read('/home/robert/csv_etc/mid_values.csv')
-dataset = np.genfromtxt('/home/robert/csv_etc/mid_values.txt', delimiter =',')
-
-#print(dataset[0])
-#print(np.shape(dataset))
-datatorch = torch.from_numpy(dataset).float()
-#print(datatorch[0])
-print(datatorch.shape)
-train_x = torch.cat((datatorch[:142],datatorch[203:320]), 0)
-test_x = torch.cat((datatorch[142:203],datatorch[320:369]), 0)
-
 # N is batch size; D_in is input dimension;
 # H is hidden dimension; D_out is output dimension.
-N, D_in, H, D_out = 100, 376, 10, 1
+N, D_in, H, D_out = 100, 376, 10, 3
+#dataset = np.read('/home/robert/csv_etc/mid_values.csv')
+dataset = np.genfromtxt('./datasets/10-05-upst1.txt', delimiter =',')
+size = len(dataset)
+split = int(0.7*size)
+#print(dataset[0])
+print(np.shape(dataset))
+datatorch = torch.from_numpy(dataset).float()
+train = datatorch[:split,:]
+test = datatorch[split:,:]
 
-# Create random Tensors to hold inputs and outputs
-#x = torch.randn(N, D_in)
-#y = torch.randn(N, D_out)
-
-train_y = torch.ones(142, D_out)
-train_y = torch.cat((train_y, torch.zeros(117, D_out)), 0)
-test_y = torch.ones(61, D_out)
-test_y = torch.cat((test_y, torch.zeros(49, D_out)), 0)
-
+train_x, train_y = train[:, :-3], train[:, -3:]
+print(train_x.shape)
+print(train_y.shape)
+test_x, test_y = test[:, :-3], test[:, -3:]
+print(train_x.shape)
+print(train_y.shape)
 # Use the nn package to define our model as a sequence of layers. nn.Sequential
 # is a Module which contains other Modules, and applies them in sequence to
 # produce its output. Each Linear Module computes output from input using a
@@ -55,7 +50,7 @@ model = stair_net(D_in, H, D_out)
 loss_fn = torch.nn.MSELoss(size_average=False)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 #learning_rate = 1e-4
-for t in range(4000):
+for t in range(500):
     # Forward pass: compute predicted y by passing x to the model. Module objects
     # override the __call__ operator so you can call them like functions. When
     # doing so you pass a Tensor of input data to the Module and it produces
@@ -89,19 +84,16 @@ for t in range(4000):
 
 y_test = model(test_x)
 print(y_test)
-print(test_y)
-acc = test_y - y_test
-print(acc)
 stcorr=0
 nocorr=0
 incorr=0
-for i in range(len(test_y)):
-	if y_test[i] > 0.9 and test_y[i] == 1:
-		stcorr = stcorr+1
-	if y_test[i] < 0.3 and test_y[i] == 0:
-		nocorr = nocorr+1 
-	if((y_test[i] > 0.9) and (test_y[i] == 0)) or ((y_test[i] < 0.3) and (test_y[i] == 1)):
-		incorr = incorr+1
+#for i in range(len(test_y)):
+#	if y_test[i] > 0.9 and test_y[i] == 1:
+#		stcorr = stcorr+1
+#	if y_test[i] < 0.3 and test_y[i] == 0:
+#		nocorr = nocorr+1 
+#	if((y_test[i] > 0.9) and (test_y[i] == 0)) or ((y_test[i] < 0.3) and (test_y[i] == 1)):
+#		incorr = incorr+1
 print(len(test_y))
 print("stairs correctly classified : %d" % (stcorr))
 print("empty correctly classified : %d" % (nocorr))
