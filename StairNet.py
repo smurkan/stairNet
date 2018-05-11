@@ -20,7 +20,7 @@ class stair_net(torch.nn.Module):
 # H is hidden dimension; D_out is output dimension.
 N, D_in, H, D_out = 100, 376, 10, 3
 #dataset = np.read('/home/robert/csv_etc/mid_values.csv')
-dataset = np.genfromtxt('./datasets/10-05-upst1.txt', delimiter =',')
+dataset = np.genfromtxt('./processedData.txt', delimiter =',')
 size = len(dataset)
 split = int(0.7*size)
 #print(dataset[0])
@@ -50,7 +50,7 @@ model = stair_net(D_in, H, D_out)
 loss_fn = torch.nn.MSELoss(size_average=False)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 #learning_rate = 1e-4
-for t in range(500):
+for t in range(100000):
     # Forward pass: compute predicted y by passing x to the model. Module objects
     # override the __call__ operator so you can call them like functions. When
     # doing so you pass a Tensor of input data to the Module and it produces
@@ -62,7 +62,8 @@ for t in range(500):
     # values of y, and the loss function returns a Tensor containing the
     # loss.
     loss = loss_fn(y_pred, train_y)
-    print(t, loss.item())
+    if t%1000 == 0:
+    	print(t, loss.item())
 
     # Zero the gradients before running the backward pass.
     #model.zero_grad()
@@ -94,9 +95,9 @@ incorr=0
 #		nocorr = nocorr+1 
 #	if((y_test[i] > 0.9) and (test_y[i] == 0)) or ((y_test[i] < 0.3) and (test_y[i] == 1)):
 #		incorr = incorr+1
-print(len(test_y))
-print("stairs correctly classified : %d" % (stcorr))
-print("empty correctly classified : %d" % (nocorr))
-print("incorrect classification : %d" % (incorr))
+#print(len(test_y))
+#print("stairs correctly classified : %d" % (stcorr))
+#print("empty correctly classified : %d" % (nocorr))
+#print("incorrect classification : %d" % (incorr))
 
 torch.save(model.state_dict(), 'testmodel.pt')
