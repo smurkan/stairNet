@@ -1,7 +1,7 @@
 import numpy as np
 import os
 
-
+#script used for shuffling datasets, filepaths have to be changed to use
 data = np.genfromtxt('/home/fredde/git-repos/stairNet/datasets/downst1.txt', delimiter=',')
 data = np.vstack((data,np.genfromtxt('/home/fredde/git-repos/stairNet/datasets/downst2.txt', delimiter=',')))
 data = np.vstack((data,np.genfromtxt('/home/fredde/git-repos/stairNet/datasets/downst3.txt', delimiter=',')))
@@ -30,4 +30,3 @@ np.savetxt("/home/fredde/git-repos/stairNet/processedData.txt", data, delimiter=
 
 print(np.shape(data))
 
-#test
